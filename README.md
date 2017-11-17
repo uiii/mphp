@@ -13,13 +13,15 @@ Or run this command in `Cmd.exe`:
 powershell -NoProfile -ExecutionPolicy Bypass -Command "iex ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/uiii/mphp/master/install.ps1'))"
 ```
 
-## Usage
+You also need to install some versions of PHP.
 
-> Install some PHP versions first
+**IMPORTANT**: Run `where php` to see which executable will be run by `php` command. It must be the one from MPHP's installation path. Otherwire move the `%LOCALAPPDATA%\mphp\bin` path in your user's `PATH` environment variable before any other path to `php` executable.
+
+## Usage
 
 Use MPHP the same way as you would use PHP CLI executable.
 You can specify the PHP version as the first argument `-<version>`.
-E.g. `mphp -5 -v` will run PHP 5 executable with argument `-v`.
+E.g. `php -5 -v` will run PHP 5 executable with argument `-v`.
 If you ommit the PHP version argument, it will run the highest previously found PHP version.
 
 `version` argument could be any version number, e.g. `5`, `5.6.32`, ...
