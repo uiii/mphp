@@ -1,57 +1,35 @@
-$cacheDir = (Join-Path $PSScriptRoot "../.cache")
+$cachePath = (Join-Path $PSScriptRoot "../.cache")
 
-function Find-File
+function Get-Cache 
 {
-	param (
-		[string] $name,
+	$content = Get-Content -Encoding UTF8 -Path $cachePath -ErrorAction Ignore
+	$csv = $content | ConvertFrom-Csv -Delimiter '|' -Header 'Version','Path' 
+	$cache = @($csv | Foreach-Object { [PSCustomObject]@{Version = [version] $_.Version; Path = $_.Path} })
 
-		[parameter(Mandatory=$false)]
-		[array] $directories
-	)
+	$cachedPaths = $cache | Select-Object -ExpandProperty 'Path'
+	$foundPaths = where.exe php | Where-Object { $_ -match ".exe$" }
 
-	if (! $directories) {
-		$directories = (Get-PSDrive -PSProvider "FileSystem" | Select-Object -ExpandProperty "Root")
+	$newPaths = $foundPaths | Where-Object { $cachedPaths -NotContains $_ }
+	
+	foreach ($path in $newPaths) {
+		# get output of `php -v`
+		$output = & $path -v 2>&1 | Out-String
+
+		if ($output -NotMatch "PHP [0-9.]+") {
+			continue
+		}
+		
+		$version = [version]$output.Split(' ')[1];
+		$cache += [PSCustomObject]@{Version=$version;Path=$path}
 	}
 
-	$found = @()
+	# sort cache by version
+	$cache = $cache | Sort-Object -Property "Version" -Descending
 
-	foreach ($directory in $directories) {
-		$files = Get-ChildItem -LiteralPath $directory -Recurse -Filter $name -ErrorAction SilentlyContinue
-		$found = $found + $files
-	}
+	# write to file
+	$cache | Foreach-Object { "$($_.Version.toString())|$($_.Path)" } | Out-File $cachePath
 
-	return $found
-}
-
-function Get-Cache
-{
-	param (
-		[string] $file,
-		[string] $key
-	)
-
-	$cache = Get-Content -Encoding UTF8 -Path (Join-Path $cacheDir $file) -ErrorAction Ignore | ConvertFrom-Csv -Delimiter '|' -Header 'Key','Value'
-
-	if (! $key) {
-		return $cache
-	}
-
-	return $cache | Where-Object { $_.Key -eq $key} | Select-Object -first 1 | Select-Object -ExpandProperty 'Value'
-}
-
-function Set-Cache
-{
-	param (
-		[string] $file,
-		[string] $key,
-		[string] $value
-	)
-
-	if (-Not (Test-Path $cacheDir)) {
-		New-Item -ItemType Directory -Path $cacheDir | Out-Null
-	}
-
-	$key + "|" + $value | Out-File -Append (Join-Path $cacheDir $file)
+	return $cache
 }
 
 function Find-PHP
@@ -60,45 +38,16 @@ function Find-PHP
 		[string] $version
 	)
 
-	if (! $version) {
-		$cache = Get-Cache -File 'paths'
+	$cache = Get-Cache
+	Write-Host $cache
 
-		$highestVersion = ($cache | Select-Object -ExpandProperty 'Key' | Measure-Object -Maximum).Maximum
-
-		if (! $highestVersion) {
-			return $null
-		}
-
-		return Find-PHP -version $highestVersion
+	if (! $cache) {
+		return $null
 	}
 
-	$cached = Get-Cache -File 'paths' -Key $version
+	$versionPattern = if (! $version) { "^.*$" } else { "^${version}(\..*|$)" }
 
-	if ($cached) {
-		return $cached
-	}
+	$php = $cache | Where-Object { $_.Version.toString() -Match $versionPattern } | Select-Object -First 1
 
-	Write-Host -NoNewline "[mphp] Searching PHP $version installation ... "
-
-	$executables = Find-File -name "php.exe"
-
-	foreach ($executable in $executables) {
-		$output = & $executable.FullName -v 2>&1 | Out-String
-
-		if ($output -NotMatch "PHP $version") {
-			continue
-		}
-
-		if (Find-File -name "*apache2_4.dll" -directories $executable.Directory.FullName) {
-			$path = $executable.Directory.FullName
-
-			Set-Cache -File 'paths' -Key $version -Value $path
-
-			Write-Host -NoNewline "`r                                                 `r"
-
-			return $path
-		}
-	}
-
-	return $null
+	return $php.Path
 }
