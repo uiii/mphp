@@ -30,8 +30,12 @@ $versionUrl = "https://raw.githubusercontent.com/uiii/mphp/master/.version"
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
 # check if installed from local or remote file
-$project, $null = Get-Version (Join-Path $PSScriptRoot ".version")
-$isLocalInstall = ($project -eq "mphp")
+$isLocalInstall = $false
+
+if ($PSScriptRoot) {
+	$project, $null = Get-Version (Join-Path $PSScriptRoot ".version")
+	$isLocalInstall = ($project -eq "mphp")	
+}
 
 # obtain source files
 $sourceFilesDir = $null
