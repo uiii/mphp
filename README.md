@@ -4,7 +4,7 @@ Multi-version PHP is a Windows utility to use one executable to run different ve
 
 ## Installation
 
-> MPHP is installed only for the **current user** in the `%LOCALAPPDATA%\mphp` directory
+> MPHP is installed by default to the `%SYSTEMDRIVE%\tools\mphp` directory
 
 Download [install.ps1](https://github.com/uiii/mphp/blob/master/install.ps1) script and run it in the PowerShell.
 
@@ -27,7 +27,7 @@ If you ommit the PHP version argument, it will run the highest previously found 
 ## Paths
 
 MPHP will try to find (search all hard drives) executable of the specified PHP version.
-If you want to specify the path manually, put it in the file `%LOCALAPPDATA%\mphp\.cache\paths` in format `<php-version>|<php-installation-path>`.
+If you want to specify the path manually, put it in the file `%SYSTEMDRIVE%\tools\mphp\.cache\paths` in format `<php-version>|<php-installation-path>`.
 
 For e.g.
 ```
@@ -38,5 +38,4 @@ For e.g.
 ## Troubleshooting
 
 ### Switching PHP versions is not working (-v parameter)
-C:\Users\uiii\AppData\Local\mphp\bin\php.bat
-Run `where php` to make sure the MPHP's executable (`C:\Users\<user>\AppData\Local\mphp\bin\php.bat`) is the first. If not, move the `%LOCALAPPDATA%\mphp\bin` path in your user's `PATH` environment variable before any other path to `php` executable.
+Run `where php` to make sure the MPHP's executable (`%SYSTEMDRIVE%\tools\mphp\bin\php.bat`) is the first. If not, move the `%SYSTEMDRIVE%\tools\mphp\bin` path in system `PATH` environment variable before any other path to `php` executable.
