@@ -2,6 +2,9 @@ param(
 	[string] $installDir = (Join-Path $env:LOCALAPPDATA "mphp")
 )
 
+# use TLS 1.2 for web requests (required by github.com)
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+
 $url = "https://github.com/uiii/mphp/archive/master.zip"
 $versionUrl = "https://raw.githubusercontent.com/uiii/mphp/master/.version"
 
