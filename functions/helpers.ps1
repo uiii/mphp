@@ -38,8 +38,7 @@ function Find-PHP
 		[string] $version
 	)
 
-	$cache = Get-Cache
-	Write-Host $cache
+	$cache = Get-Cache	
 
 	if (! $cache) {
 		return $null
