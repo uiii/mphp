@@ -69,7 +69,7 @@ $binPath = Join-Path $installDir "bin"
 $environmentPath = (Get-ItemProperty -Path Registry::"HKEY_CURRENT_USER\Environment").Path
 
 if (-Not $environmentPath.ToLower().Contains($binPath.ToLower())) {
-	$environmentPath = "$environmentPath;$binPath"
+	$environmentPath = "$binPath;$environmentPath"
 }
 
 setx PATH $environmentPath

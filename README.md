@@ -13,9 +13,7 @@ Or run this command in `Cmd.exe`:
 powershell -NoProfile -ExecutionPolicy Bypass -Command "iex ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/uiii/mphp/master/install.ps1'))"
 ```
 
-You also need to install some versions of PHP.
-
-**IMPORTANT**: Run `where php` to see which executable will be run by `php` command. It must be the one from MPHP's installation path. Otherwire move the `%LOCALAPPDATA%\mphp\bin` path in your user's `PATH` environment variable before any other path to `php` executable.
+You also need to install at least one versions of PHP.
 
 ## Usage
 
@@ -36,3 +34,9 @@ For e.g.
 5|C:\tools\php56
 7|C:\tools\php71
 ```
+
+## Troubleshooting
+
+### Switching PHP versions is not working (-v parameter)
+C:\Users\uiii\AppData\Local\mphp\bin\php.bat
+Run `where php` to make sure the MPHP's executable (`C:\Users\<user>\AppData\Local\mphp\bin\php.bat`) is the first. If not, move the `%LOCALAPPDATA%\mphp\bin` path in your user's `PATH` environment variable before any other path to `php` executable.
