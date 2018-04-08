@@ -2,7 +2,7 @@
 
 $phpVersion = $null
 
-if ($args -and ($args[0] -match '\-[0-9.]')) {
+if ($args -and ($args[0] -match '^\-[0-9.]')) {
 	$phpVersion = $args[0].Substring(1)
 	$args = $args[1 .. $args.count]
 }
